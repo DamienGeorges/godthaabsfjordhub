@@ -72,14 +72,17 @@ coords.wgs84 <- coordinates(sptab.wgs84)
 colnames(coords.wgs84) <- c("long", "lat")
 
 ## stick back the coordinates into initial table
-tab <- cbind(tab, coords.wgs84)
-head(tab)
+fus.tab <- cbind(tab, coords.wgs84)
+head(fus.tab)
 
-## let's convert this dataset into a gee fusion table
-fus.tab <- tab
 ## add the column location                      
 fus.tab$location <- paste("<Point><coordinates>", fus.tab$long, ",", fus.tab$lat, 
                           ",", fus.tab$z, "</coordinates></Point>", sep = "")
+
+## remove all "." from colnames that seems to be an issue in gee
+colnames(fus.tab) <- gsub(".", "_", colnames(fus.tab), fixed = TRUE)
+
+
 ## write the table
 write.csv(fus.tab, file = file.path(out.dir, "godthaabsfjord_plots_fusion_table.csv"),
           row.names = FALSE)

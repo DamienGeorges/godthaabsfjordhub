@@ -1,4 +1,4 @@
-"plot","site","alt","long.garmin","lat.garmin","x.garmin","y.garmin","z.garmin","x.trimble","y.trimble","z.trimble","x.diff","y.diff","date","inclin.down","inclin.dir","X","x","y","z","long","lat","location"
+"plot","site","alt","long_garmin","lat_garmin","x_garmin","y_garmin","z_garmin","x_trimble","y_trimble","z_trimble","x_diff","y_diff","date","inclin_down","inclin_dir","X","x","y","z","long","lat","location"
 "P001",3,20,NA,NA,NA,NA,NA,476684.487,7151237.69,20.075,NA,NA,"2011-07-02",30,165,NA,476684.487,7151237.69,20.075,-51.4851247571479,64.4857874099018,"<Point><coordinates>-51.4851247571479,64.4857874099018,20.075</coordinates></Point>"
 "P002",3,20,NA,NA,NA,NA,NA,476676.194,7151232.187,20.069,NA,NA,"2011-07-02",20,170,NA,476676.194,7151232.187,20.069,-51.4852964264861,64.4857374622038,"<Point><coordinates>-51.4852964264861,64.4857374622038,20.069</coordinates></Point>"
 "P003",3,20,NA,NA,NA,NA,NA,476667.629,7151226.435,19.973,NA,NA,"2011-07-02",25,180,NA,476667.629,7151226.435,19.973,-51.4854737148054,64.4856852613404,"<Point><coordinates>-51.4854737148054,64.4856852613404,19.973</coordinates></Point>"
