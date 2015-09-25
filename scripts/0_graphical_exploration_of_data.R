@@ -45,6 +45,9 @@ sp.dat <- read.csv(path.to.sp.tab, stringsAsFactors = FALSE)
 
 ## reshape species datset --------------------------------------------------
 
+## add a subsite index
+pl.dat <- pl.dat %>% arrange(plot)
+pl.dat$subsite <- rep(1:(nrow(pl.dat)/6), each = 6)
 
 ## check if there is there is several plants associated to a pin
 plants_by_pin <- sp.dat %>% group_by(plot, pin.no) %>% summarise(nb_species = sum(presence))
@@ -60,11 +63,14 @@ sp_sum_by_plot <- sp.dat %>% group_by(plot, taxon) %>% summarise(nb_occ = sum(pr
 sp_sum_by_plot_wp <- full_join(sp_sum_by_plot, pl.dat) %>% as.data.frame
 
 ## keep only predictors of interest
-id.vars <- c("plot", "taxon", "nb_occ", "site", "alt", "inclin_down", "inclin_dir",
+id.vars <- c("plot", "taxon", "nb_occ", "site", "subsite", "alt", "inclin_down", "inclin_dir",
              "x", "y", "z")
-mes.vars <- c("bio_6_rect", "bio_10_rect", "bio_18_rect", "bio_19_rect", "ddeg", "sri")
+mes.vars <- c("bio_6_rect", "bio_10_rect", "bio_18_rect", "bio_19_rect", "ddeg", "sri", "mean_summ_ndvi_yos", "cv_mean_summ_ndvi_2001_to_yos")
 
 sp_sum_by_plot_wp <- sp_sum_by_plot_wp[, c(id.vars, mes.vars)]
+
+## rename the colum with too long name
+sp_sum_by_plot_wp <- sp_sum_by_plot_wp %>% rename(cv_ndvi_2001_yos = cv_mean_summ_ndvi_2001_to_yos)
 
 sp_sum_by_plot_wp_m <- melt(sp_sum_by_plot_wp, id.vars = id.vars )
 
@@ -73,6 +79,7 @@ levels(sp_sum_by_plot_wp_m$taxon) <- gsub(" ", "\n", levels(sp_sum_by_plot_wp_m$
 
 ## produce some scatter plots -----------------------------------------------
 
+## 1. a general plot where we try to show the link btw predictors and species nb occurences (bit fuzzy)
 gg <- ggplot(data = sp_sum_by_plot_wp_m) +
   geom_point(aes(x = value, y = nb_occ, color = as.factor(site), shape = as.factor(alt)), alpha = .5) +
   geom_smooth(aes(x = value, y = nb_occ)) +
@@ -81,3 +88,53 @@ gg <- ggplot(data = sp_sum_by_plot_wp_m) +
   scale_shape_discrete(name = "altitude") + theme(text = element_text(size = 8))
 
 ggsave(gg, filename = "~/GOGTHAABSFJORD/godthaabsfjordhub/figs/nbocc_fct_predictors_by_sp.png", width = 300, height = 300, units = "mm", dpi = 200)
+
+## 2. group plots by subsite
+sp_sum_by_subsite_alt <- sp_sum_by_plot_wp_m %>% group_by(taxon, site, alt, variable, subsite) %>% summarise(count = n(),
+                                                                                                 min.value = min(value),
+                                                                                                 mean.value = mean(value),
+                                                                                                 med.value = median(value),
+                                                                                                 max.value = max(value),
+                                                                                                 min.nb_occ = min(nb_occ),
+                                                                                                 mean.nb_occ = mean(nb_occ),
+                                                                                                 med.nb_occ = median(nb_occ),
+                                                                                                 max.nb_occ = max(nb_occ))
+gg <- ggplot(data = sp_sum_by_subsite_alt, aes(x = med.value, y = med.nb_occ, 
+                                            xmin = min.value, xmax = max.value,
+                                            ymin = min.nb_occ, ymax = max.nb_occ,
+                                            color = as.factor(site), shape = as.factor(alt)), alpha = .5) +
+  geom_point() + geom_errorbar(width=0, alpha = .5) + geom_errorbarh(height=0, alpha = .5) +
+#   geom_smooth(aes(group = 1)) +
+  facet_grid(taxon ~ variable ,scales = "free_x") + coord_cartesian(ylim = c(0,25)) +
+  scale_color_discrete(name = "site") + 
+  scale_shape_discrete(name = "altitude") + theme(text = element_text(size = 8))
+
+ggsave(gg, filename = "~/GOGTHAABSFJORD/godthaabsfjordhub/figs/nbocc_fct_predictors_by_sp_alti_subsite.png", width = 300, height = 300, units = "mm", dpi = 200)
+
+## 2. group plots by subsite
+sp_sum_by_site_alt <- sp_sum_by_plot_wp_m %>% group_by(taxon, site, alt, variable) %>% summarise(count = n(),
+                                                                                                             min.value = min(value),
+                                                                                                             mean.value = mean(value),
+                                                                                                             med.value = median(value),
+                                                                                                             max.value = max(value),
+                                                                                                             min.nb_occ = min(nb_occ),
+                                                                                                             mean.nb_occ = mean(nb_occ),
+                                                                                                             med.nb_occ = median(nb_occ),
+                                                                                                             max.nb_occ = max(nb_occ))
+gg <- ggplot(data = sp_sum_by_site_alt, aes(x = med.value, y = med.nb_occ, 
+                                               xmin = min.value, xmax = max.value,
+                                               ymin = min.nb_occ, ymax = max.nb_occ,
+                                               color = as.factor(site), shape = as.factor(alt)), alpha = .5) +
+  geom_point() + geom_errorbar(width=0, alpha = .5) + geom_errorbarh(height=0, alpha = .5) +
+  #   geom_smooth(aes(group = 1)) +
+  facet_grid(taxon ~ variable ,scales = "free_x") + coord_cartesian(ylim = c(0,25)) +
+  scale_color_discrete(name = "site") + 
+  scale_shape_discrete(name = "altitude") + theme(text = element_text(size = 8))
+
+ggsave(gg, filename = "~/GOGTHAABSFJORD/godthaabsfjordhub/figs/nbocc_fct_predictors_by_sp_alti_site.png", width = 300, height = 300, units = "mm", dpi = 200)
+
+
+
+
+
+
