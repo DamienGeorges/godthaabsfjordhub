@@ -124,7 +124,7 @@ var.to.rect <- paste0("bio_", c(1, 5, 6, 8:11))
 
 ## calculate the rectification value to apply to each site
 rect.val <- data.frame(site = ref[, "plot"],
-                       rect.val = (ref[, "z"] - ref[, "wc_alt"] ) * 0.005 * 10)
+                       rect.val = (ref[, "z"] - ref[, "wc_alt"] ) * (-0.005) * 10)
 ## set a 0°C for sites without elevation
 rect.val$rect.val[is.na(rect.val$rect.val)] <- 0
 
